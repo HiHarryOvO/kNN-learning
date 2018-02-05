@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jan 30 20:32:01 2018
+
+@author: 44182
+"""
+
+import kNN
+import operator
+from numpy import *
+
+group, labels = kNN.createDataSet()
+
+def classify0(inX, dataSet, labels, k):
+    dataSetSize = dataSet.shape[0]
+    # 矩阵的shape属性，0取行数，1取列数
+    diffMat = tile(inX, (dataSetSize, 1)) - dataSet
+    # 计算输入的点和每个点的横纵坐标差
+    # tile函数将矩阵重复多次，第二个参数表示横纵重复次数
+    sqDiffMat = diffMat ** 2
+    # 横纵坐标差平方
+    sqDistances = sqDiffMat.sum(axis = 1)
+    # 求和，(axis=1)表示各坐标求和，返回值为矩阵，例如：[3]
+    distances = sqDistances ** 0.5
+    # 开平方
+    sortedDistIndicies = distances.argsort()
+    # argsort函数返回的是数组值从小到大的索引值
+    classCount = {}
+    # 保存A,B出现次数的字典
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndicies[i]]
+        # 获取索引值对应的是A还是B
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0) + 1
+        # 在字典中保存A,B出现的次数
+        sortedClassCount = sorted(classCount.items(), 
+                                  key = operator.itemgetter(1), reverse = True)
+        # 按照A,B出现的次数排序
+    return sortedClassCount[0][0]   # 返回A,B出现最多的那个
+
+class0 = classify0([0.1,0.1], group, labels, 3)
+print(class0)
